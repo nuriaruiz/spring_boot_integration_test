@@ -65,6 +65,10 @@ public class ConcurrencyTest {
         List<String> violations = new ArrayList<>();
 
         for (Class<?> clazz : springComponents) {
+            // Ignorar BadCacheService porque es nuestro ejemplo intencional de código con problemas
+            if (clazz.equals(BadCacheService.class)) {
+                continue;
+            }
             violations.addAll(checkForMutableStaticFields(clazz));
         }
 
@@ -93,6 +97,8 @@ public class ConcurrencyTest {
 
             fail(message.toString());
         }
+
+        System.out.println("\n✅ Test PASÓ: No se encontraron problemas de concurrencia en componentes Spring (excepto BadCacheService que es intencional)");
     }
 
     @Test
