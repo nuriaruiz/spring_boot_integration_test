@@ -10,6 +10,7 @@ Ejemplos:
 - WebMvc controller slice test (@WebMvcTest + MockMvc): examples/webmvc-controller-test
 - MockMvc con contexto completo (@SpringBootTest + @AutoConfigureMockMvc): examples/mockmvc-fullcontext-test
 - Slice de servicio con repositorio mockeado (@MockBean): examples/service-slice-test
+- Test de detección de problemas de concurrencia (Reflections): examples/concurrency-test
 
 ## Guía rápida: cuándo crear/ajustar tests @WebMvcTest
 
@@ -33,3 +34,13 @@ Nota: @WebMvcTest es un slice test centrado en la capa web. Si necesitas probar 
 - Implementar/refactorizar reglas de negocio: guía TDD del servicio y cubre ramas complejas.
 - Aislar dependencias externas (repositorios/clients): controla respuestas con @MockBean y valida salidas exactas.
 - Reproducir bugs de lógica: primero el test del servicio, luego la corrección para evitar regresiones.
+## Guía rápida: cuándo crear/ajustar tests de detección de concurrencia
+
+- Al añadir concurrencia al proyecto: ExecutorService, @Async, @Scheduled, parallel streams, CompletableFuture.
+- Cuando aparecen componentes Spring con estado compartido: campos estáticos, caches en memoria, contadores.
+- En aplicaciones de alta concurrencia: APIs REST con múltiples threads, procesamiento batch paralelo.
+- Para prevenir race conditions: detecta automáticamente HashMap/ArrayList estáticos, campos mutables sin sincronización, colecciones no thread-safe.
+- Como gate en CI/CD: ejecuta en cada PR para bloquear código con problemas de threading antes del merge.
+- Para educar al equipo: el test muestra exactamente qué campos son problemáticos y cómo solucionarlos (volatile, AtomicInteger, ConcurrentHashMap).
+
+Nota: Este test usa Reflections para escanear automáticamente todos los @Component/@Service/@Repository y detectar patrones problemáticos. Falla con un mensaje detallado mostrando soluciones específicas para cada problema encontrado.
